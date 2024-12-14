@@ -18,16 +18,16 @@ services:
         - redis_data:/data  
     web:
         build: .
-        command:
+        command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b '0.0.0.0'"
         volumes:
-            -".:/rails"
+            - .:/rails
         ports:
-            -"3000:3000"
+            - "3000:3000"
         depends_on:
             - db
             - redis
         environment:
-            - DATABASE_URL=postgresql://postgres:password@db:5432/myapp_development
+            - DATABASE_URL=postgresql://postgres:password@db:5432/store_development
             - REDIS_URL=redis://redis:6379/0
     test:
         build: .
@@ -38,8 +38,8 @@ services:
             - db
             - redis 
         environment:
-            - DATABASE_URL: postgresql://postgres:password@db:5432/myapp_test
-            - REDIS_URL: redis://redis:6379/0
+            - DATABASE_URL=postgresql://postgres:password@db:5432/store_test
+            - REDIS_URL=redis://redis:6379/0
 volumes:
     postgres13:
     redis_data:
