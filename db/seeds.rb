@@ -23,3 +23,10 @@ Product.create([
     price: 999.99
   }
 ])
+
+
+  product_x = Product.create(name: "Nome do produto X", price: 7.00)
+  product_y = Product.create(name: "Nome do produto Y", price: 9.90)
+  cart = Cart.create
+  CartItem.create(cart: cart, product: product_x, quantity: 2)
+  CartItem.create(cart: cart, product: product_y, quantity: 1)
