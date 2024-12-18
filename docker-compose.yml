@@ -6,6 +6,7 @@ services:
         environment:
           - POSTGRES_USER=postgres
           - POSTGRES_PASSWORD=password
+          - POSTGRES_DB=db
         ports:
             - '5432:5432'
         volumes:
@@ -17,17 +18,32 @@ services:
         volumes:
         - redis_data:/data  
     web:
-        ## TODO
+        build: .
+        command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b '0.0.0.0'"
+        volumes:
+            - .:/rails
+        ports:
+            - "3000:3000"
+        depends_on:
+            - db
+            - redis
+        environment:
+            - DATABASE_URL=postgresql://postgres:password@db:5432/store_development
+            - REDIS_URL=redis://redis:6379/0
     test:
         build: .
-        command: bundle exec rspec
+        command: bash -c "bin/rails db:create db:migrate RAILS_ENV=test && bundle exec rspec"
         volumes:
             - .:/rails
         depends_on:
             - db
             - redis 
         environment:
-            - DATABASE_URL: postgresql://postgres:password@db:5432/myapp_test
-            - REDIS_URL: redis://redis:6379/0
+            - RAILS_ENV=test
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=password
+            - DATABASE_URL=postgresql://postgres:password@db:5432/store_test
+            - REDIS_URL=redis://redis:6379/0
 volumes:
     postgres13:
+    redis_data:
